@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style>
+			#wrap {
+				margin: 100px auto;
+				width: 600px;
+				height: 600px;
+				border: 1px solid #000;
+			}
+			#canvas {
+				background: #000;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="wrap">
+			<canvas id="canvas" width="600px" height="600px"></canvas>
+		</div>
+		<script>
+			var canvas = document.getElementById('canvas');
+			var ctx = canvas.getContext('2d');
+			var w = canvas.width;
+			var h = canvas.height;
+			
+			var snowList = [];
+				
+			window.requestAnimationFrame(snowStart);
+			
+			function creatSnow () {
+				var r = 2 + 5 * Math.random();
+				var posx = Math.random() * 2 * w - 0.5 * w;
+				var posy = -100;
+				var r1 = 0.5 + Math.random();
+				let snow = {
+					speed: 15+Math.round(Math.random()*2),
+					die: false,
+					posx: posx,
+					posy: posy,
+					r: r
+				}
+				snowList.push(snow);
+			}
+			
+			function snowStart () {
+				creatSnow();
+				creatSnow();
+				let len = snowList.length;
+				for(var i=0;i<len;i++){
+					snowList[i].posy += snowList[i].speed;
+					if(snowList[i].posy > h+50){
+						snowList[i].die = true;
+					}
+				}
+				for(var i=len-1;i>=0;i--){
+					if(snowList[i].die){
+						snowList.splice(i,1);
+					}
+				}
+				render();
+				window.requestAnimationFrame(snowStart);
+			}
+			
+			function render () {
+				let len = snowList.length;
+				ctx.clearRect(0, 0, w, h);
+				for(var i=0;i<len;i++){
+					if(!snowList[i].die){
+						ctx.beginPath();
+						ctx.fillStyle = getColor(snowList[i].posx, snowList[i].posy, 0.5+Math.random(), snowList[i].r);
+						ctx.arc(snowList[i].posx, snowList[i].posy, snowList[i].r, 0, 2*Math.PI);
+						ctx.fill();
+					}
+				}
+			}
+			
+			function getColor (x, y, r1, r2) {
+				var gra = ctx.createRadialGradient(x,y,r1,x,y,r2);
+				gra.addColorStop(0, 'rgba(237,237,237,0.8)');
+				gra.addColorStop(0.5, 'rgba(220,220,220,0.6)');
+				gra.addColorStop(0.8, 'rgba(209,209,209,0.3)');
+				gra.addColorStop(1, 'rgba(199,199,199,0)');
+				return gra;
+			}
+		</script>
+	</body>
+</html>
